@@ -16,11 +16,13 @@ public class UserDoc {
 
     String userName;
 
-    String passWord;
+    String password;
 
     String firstName;
 
     String lastName;
+
+    int creditBalance;
 
     public UserDoc() {
     }
@@ -41,12 +43,12 @@ public class UserDoc {
         this.userName = userName;
     }
 
-    public String getPassWord() {
-        return passWord;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getFirstName() {
@@ -63,5 +65,13 @@ public class UserDoc {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public int getCreditBalance() {
+        return creditBalance;
+    }
+
+    public void setCreditBalance(int creditBalance) {
+        this.creditBalance = creditBalance;
     }
 }
