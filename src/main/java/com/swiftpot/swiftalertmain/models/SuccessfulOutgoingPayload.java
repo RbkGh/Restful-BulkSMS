@@ -12,8 +12,8 @@ public class SuccessfulOutgoingPayload extends OutgoingPayload {
     }
 
     public SuccessfulOutgoingPayload(Object responseObject) {
-        this.message = "00";
-        this.status = "Successful";
+        this.status = "00";
+        this.message = "Successful";
         this.responseObject = responseObject;
     }
 }
