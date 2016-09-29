@@ -1,11 +1,14 @@
 package com.swiftpot.swiftalertmain.businesslogic;
 
+import com.google.gson.Gson;
 import com.swiftpot.swiftalertmain.db.model.UserDoc;
 import com.swiftpot.swiftalertmain.exceptions.InvalidCredentialsException;
 import com.swiftpot.swiftalertmain.models.*;
 import com.swiftpot.swiftalertmain.repositories.UserDocRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +23,14 @@ import java.util.Date;
 @Service
 public class AuthLogic {
 
+    Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     UserDocRepository userDocRepository;
+    @Autowired
+    Gson gson;
 
     public OutgoingPayload signIn(SignInRequest signInRequest) throws ServletException{
+        log.info("Incoming signinRequest = {}",gson.toJson(signInRequest));
         OutgoingPayload outgoingPayload ;
         if(isUserCredentialsOk(signInRequest)){
             UserDoc userDoc = userDocRepository.findByUserNameAndPassword(signInRequest.getUserName(), signInRequest.getPassword());
