@@ -34,6 +34,7 @@ configurations {
 }
 
 dependencies {
+	compile fileTree(dir: '/src/main/resources/static', include: ['*.jar'])
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')

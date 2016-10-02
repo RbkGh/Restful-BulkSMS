@@ -26,7 +26,7 @@ public class SwiftAlertMainApplication extends SpringBootServletInitializer{
 	public FilterRegistrationBean jwtFilter(){
 		final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
 		registrationBean.setFilter(new JwtFilter());
-		registrationBean.addUrlPatterns("/api/v1/*");
+		registrationBean.addUrlPatterns("/api/v2/*");
 
 
 

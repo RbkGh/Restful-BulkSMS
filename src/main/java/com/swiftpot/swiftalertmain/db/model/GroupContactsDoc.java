@@ -21,6 +21,8 @@ public class GroupContactsDoc {
 
     String contactPhoneNum;
 
+    String groupId;
+
     public GroupContactsDoc() {
     }
 
@@ -62,5 +64,13 @@ public class GroupContactsDoc {
 
     public void setContactPhoneNum(String contactPhoneNum) {
         this.contactPhoneNum = contactPhoneNum;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }

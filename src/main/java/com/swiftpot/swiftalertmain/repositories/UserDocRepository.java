@@ -2,6 +2,7 @@ package com.swiftpot.swiftalertmain.repositories;
 
 import com.swiftpot.swiftalertmain.db.model.UserDoc;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Repository;
  *         26-Sep-16 @ 9:09 PM
  */
 @Repository
-public interface UserDocRepository extends MongoRepository<UserDoc,String> {
+public interface UserDocRepository extends MongoRepository<UserDoc,String>{
     UserDoc findByUserNameAndPassword(String userName,String password);
+    UserDoc findByUserName(String userName);
+
 }

@@ -23,14 +23,16 @@ public class MessagesReportDoc {
 
     String groupId;
 
-    String recipientNum;
+    String noOfMessages;
 
-    String senderId;
+    int creditBefore;
 
-    String message;
+    int creditAfter;
+
 
     public MessagesReportDoc() {
     }
+
 
     public String getId() {
         return id;
@@ -72,27 +74,29 @@ public class MessagesReportDoc {
         this.groupId = groupId;
     }
 
-    public String getRecipientNum() {
-        return recipientNum;
+    public String getNoOfMessages() {
+        return noOfMessages;
     }
 
-    public void setRecipientNum(String recipientNum) {
-        this.recipientNum = recipientNum;
+    public void setNoOfMessages(String noOfMessages) {
+        this.noOfMessages = noOfMessages;
     }
 
-    public String getSenderId() {
-        return senderId;
+    public int getCreditBefore() {
+        return creditBefore;
     }
 
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
+    public void setCreditBefore(int creditBefore) {
+        this.creditBefore = creditBefore;
     }
 
-    public String getMessage() {
-        return message;
+    public int getCreditAfter() {
+        return creditAfter;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setCreditAfter(int creditAfter) {
+        this.creditAfter = creditAfter;
     }
+
+
 }
