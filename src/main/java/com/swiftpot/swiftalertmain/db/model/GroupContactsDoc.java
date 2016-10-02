@@ -26,6 +26,14 @@ public class GroupContactsDoc {
     public GroupContactsDoc() {
     }
 
+    public GroupContactsDoc(String userName, String firstName, String lastName, String contactPhoneNum, String groupId) {
+        this.userName = userName;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.contactPhoneNum = contactPhoneNum;
+        this.groupId = groupId;
+    }
+
     public String getId() {
         return id;
     }

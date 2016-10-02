@@ -3,32 +3,33 @@ package com.swiftpot.swiftalertmain.models;
 /**
  * @author Ace Programmer Rbk
  *         <Rodney Kwabena Boachie at [rodney@swiftpot.com,rbk.unlimited@gmail.com]> on
- *         02-Oct-16 @ 2:51 PM
+ *         02-Oct-16 @ 9:09 PM
  */
-public class BulkMessagesRequest {
+public class SingleMessagesRequest {
 
     String userName;
-
-    String groupId;
 
     String senderId;
 
     String message;
 
-    public BulkMessagesRequest() {
+    String recieverNum;
+
+    public SingleMessagesRequest() {
     }
 
-    public BulkMessagesRequest(String userName, String groupId, String senderId, String message) {
+    /**
+     *
+     * @param userName
+     * @param senderId
+     * @param message
+     * @param recieverNum
+     */
+    public SingleMessagesRequest(String userName, String senderId, String message, String recieverNum) {
         this.userName = userName;
-        this.groupId = groupId;
         this.senderId = senderId;
         this.message = message;
-    }
-
-    public BulkMessagesRequest(String userName,String senderId, String message) {
-        this.userName = userName;
-        this.senderId = senderId;
-        this.message = message;
+        this.recieverNum = recieverNum;
     }
 
     public String getUserName() {
@@ -37,14 +38,6 @@ public class BulkMessagesRequest {
 
     public void setUserName(String userName) {
         this.userName = userName;
-    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
     }
 
     public String getSenderId() {
@@ -61,5 +54,13 @@ public class BulkMessagesRequest {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getRecieverNum() {
+        return recieverNum;
+    }
+
+    public void setRecieverNum(String recieverNum) {
+        this.recieverNum = recieverNum;
     }
 }
