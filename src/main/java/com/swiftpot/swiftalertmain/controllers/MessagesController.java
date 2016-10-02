@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
  *         02-Oct-16 @ 2:47 PM
  */
 @RestController
-@RequestMapping(path = "")
+@RequestMapping(path = "/api/v2")
 public class MessagesController{
 
     @Autowired
     MessagesLogic messagesLogic;
 
 
-    @RequestMapping(path = "/message",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "/messages",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
     public OutgoingPayload sendMessagesInBulk(@RequestBody BulkMessagesRequest bulkMessagesRequest) {
         return messagesLogic.sendMessagesInBulk(bulkMessagesRequest);
     }
