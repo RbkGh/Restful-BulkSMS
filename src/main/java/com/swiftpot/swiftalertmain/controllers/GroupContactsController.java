@@ -30,12 +30,12 @@ public class GroupContactsController {
         return groupContactsLogic.createMultipleGroupContacts(bulkGroupContactsCreationRequest);
     }
 
-    @RequestMapping(path = "/groups/group/{id}", method = RequestMethod.DELETE, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @RequestMapping(path = "/contacts/contact/{id}", method = RequestMethod.DELETE, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public OutgoingPayload deleteSingleGroupContactById(@PathVariable String id){
         return groupContactsLogic.deleteSingleGroupContactById(id);
     }
 
-    @RequestMapping(path = "/groups/group", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "/contacts/contact", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     public OutgoingPayload updateSingleGroupContact(@RequestBody GroupContactsDoc groupContactsDoc){
         return groupContactsLogic.updateSingleGroupContact(groupContactsDoc);
     }

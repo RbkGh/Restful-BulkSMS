@@ -12,10 +12,11 @@ import com.swiftpot.swiftalertmain.repositories.GroupsDocRepository;
 import com.swiftpot.swiftalertmain.repositories.MessagesDetailedReportDocRepository;
 import com.swiftpot.swiftalertmain.repositories.MessagesReportDocRepository;
 import com.swiftpot.swiftalertmain.repositories.UserDocRepository;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import java.util.UUID;
  *         <Rodney Kwabena Boachie at [rodney@swiftpot.com,rbk.unlimited@gmail.com]> on
  *         02-Oct-16 @ 10:45 PM
  */
+@Service
 public class BaseMessageSender {
 
     @Autowired

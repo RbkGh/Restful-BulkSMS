@@ -36,7 +36,7 @@ public class GroupsController {
         return groupsLogic.deleteOneGroup(groupsDoc);
     }
 
-    @RequestMapping(path = "/groups/group/{id}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "/groups/group", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public OutgoingPayload createOneGroup(@RequestBody GroupsDoc groupsDoc) {
         return groupsLogic.createOneGroup(groupsDoc);
     }
