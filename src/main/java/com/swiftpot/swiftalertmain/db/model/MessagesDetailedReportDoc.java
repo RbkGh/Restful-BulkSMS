@@ -17,7 +17,7 @@ public class MessagesDetailedReportDoc {
     @Id
     String id;
 
-    Date dateCreated;
+    String dateCreated;
 
     String messageId;
 
@@ -33,7 +33,7 @@ public class MessagesDetailedReportDoc {
     public MessagesDetailedReportDoc() {
     }
 
-    public MessagesDetailedReportDoc(Date dateCreated, String messageId, String recipientNum, String senderId,String groupId) {
+    public MessagesDetailedReportDoc(String dateCreated, String messageId, String recipientNum, String senderId,String groupId) {
         this.dateCreated = dateCreated;
         this.messageId = messageId;
         this.recipientNum = recipientNum;
@@ -49,11 +49,11 @@ public class MessagesDetailedReportDoc {
         this.id = id;
     }
 
-    public Date getDateCreated() {
+    public String getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreated(Date dateCreated) {
+    public void setDateCreated(String dateCreated) {
         this.dateCreated = dateCreated;
     }
 

@@ -22,7 +22,7 @@ public class GroupsDoc {
 
     String groupName;
 
-    Date dateCreated;
+    String dateCreated;
 
     public GroupsDoc() {
     }
@@ -59,11 +59,11 @@ public class GroupsDoc {
         this.groupName = groupName;
     }
 
-    public Date getDateCreated() {
+    public String getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreated(Date dateCreated) {
+    public void setDateCreated(String dateCreated) {
         this.dateCreated = dateCreated;
     }
 }

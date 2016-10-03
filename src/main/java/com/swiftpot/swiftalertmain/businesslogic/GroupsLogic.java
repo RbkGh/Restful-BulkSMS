@@ -2,6 +2,7 @@ package com.swiftpot.swiftalertmain.businesslogic;
 
 import com.google.gson.Gson;
 import com.swiftpot.swiftalertmain.db.model.GroupsDoc;
+import com.swiftpot.swiftalertmain.helpers.CustomDateFormat;
 import com.swiftpot.swiftalertmain.models.ErrorOutgoingPayload;
 import com.swiftpot.swiftalertmain.models.OutgoingPayload;
 import com.swiftpot.swiftalertmain.models.SuccessfulOutgoingPayload;
@@ -11,6 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +37,7 @@ public class GroupsLogic {
         OutgoingPayload outgoingPayload;
         try {
             List<GroupsDoc> groupsDocList = groupsDocRepository.findAllByUserName(userName);
+            log.info("Groups of user {} is {}", userName, g.toJson(groupsDocList));
             outgoingPayload = new SuccessfulOutgoingPayload(groupsDocList);
         } catch (Exception e) {
             outgoingPayload = new ErrorOutgoingPayload("Could Not Get Groups.Are you sure user exists?");
@@ -83,21 +88,34 @@ public class GroupsLogic {
     public OutgoingPayload createOneGroup(GroupsDoc groupsDoc) {
         log.info("Create One GroupName Request : {}", g.toJson(groupsDoc));
         /**
-         * generate 40char groupId and save to db,this is used in both MessageReport and MessageReportDetailed for querying
+         * generate 20char groupId and save to db,this is used in both MessageReport and MessageReportDetailed for querying
          */
-        String groupId = UUID.randomUUID().toString().toUpperCase().substring(0, 40);
+        String groupId = UUID.randomUUID().toString().toUpperCase().substring(0, 20);
         groupsDoc.setGroupId(groupId);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(CustomDateFormat.getDateFormat());
+        String dateNow = simpleDateFormat.format(Date.from(Instant.now()));
+        groupsDoc.setDateCreated(dateNow);
 
         OutgoingPayload outgoingPayload;
 
-        try {
-            GroupsDoc groupsDocFinal = groupsDocRepository.save(groupsDoc);
-            outgoingPayload = new SuccessfulOutgoingPayload("Created Successfully",groupsDocFinal);
+        String groupNameFromUser = groupsDoc.getGroupName();
 
-        } catch (Exception e) {
-            log.info("Exception cause : " + e.getCause().getMessage());
-            outgoingPayload = new ErrorOutgoingPayload("Bro,I couldn't save a Group with Id of {}.Boy,I'm stoned!!:P =D", groupsDoc.getId());
+        try{
+        GroupsDoc groupsDocFromDb = groupsDocRepository.findByGroupName(groupNameFromUser);
+        String groupsDocFromDBgroupName = groupsDocFromDb.getGroupName();
+        if(groupsDocFromDBgroupName == groupNameFromUser){
+            //dont save document,return to user that it was present already
+            outgoingPayload = new ErrorOutgoingPayload("Group Name exists already");
+        }else{
+            GroupsDoc newlyCreatedGroup = groupsDocRepository.save(groupsDoc);
+            outgoingPayload = new SuccessfulOutgoingPayload("Created Successfully",newlyCreatedGroup);
         }
+        }catch (NullPointerException e){
+            outgoingPayload = new ErrorOutgoingPayload("Group Name exists already");
+        }catch (Exception e ){
+            outgoingPayload = new ErrorOutgoingPayload("Computers make mistakes too,bruh");
+        }
+
         return outgoingPayload;
     }
 }

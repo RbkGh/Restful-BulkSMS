@@ -16,6 +16,7 @@ import java.util.List;
 public interface GroupsDocRepository extends MongoRepository<GroupsDoc,String> {
     List<GroupsDoc> findAllByGroupId(String groupId);
     List<GroupsDoc> findAllByUserName(String userName);
+    GroupsDoc findByGroupName(String groupName);
     GroupsDoc findByGroupId(String groupId);
 
 }

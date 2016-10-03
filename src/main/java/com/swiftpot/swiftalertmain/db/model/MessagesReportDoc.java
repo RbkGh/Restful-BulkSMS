@@ -15,7 +15,7 @@ public class MessagesReportDoc {
     @Id
     String id;
 
-    Date dateCreated;
+    String dateCreated;
 
     String messageId;
 
@@ -42,11 +42,11 @@ public class MessagesReportDoc {
         this.id = id;
     }
 
-    public Date getDateCreated() {
+    public String getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreated(Date dateCreated) {
+    public void setDateCreated(String dateCreated) {
         this.dateCreated = dateCreated;
     }
 

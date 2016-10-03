@@ -5,6 +5,7 @@ import com.swiftpot.swiftalertmain.db.model.GroupContactsDoc;
 import com.swiftpot.swiftalertmain.db.model.MessagesDetailedReportDoc;
 import com.swiftpot.swiftalertmain.db.model.MessagesReportDoc;
 import com.swiftpot.swiftalertmain.db.model.UserDoc;
+import com.swiftpot.swiftalertmain.helpers.CustomDateFormat;
 import com.swiftpot.swiftalertmain.helpers.DeliveryStatus;
 import com.swiftpot.swiftalertmain.ifaces.SMSSender;
 import com.swiftpot.swiftalertmain.models.SMSSenderRequest;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,7 +56,7 @@ public class BaseMessageSender {
         // Set SenderId to be used for all contacts in group
         String senderIdGlobal = senderId;
         // Set MessageId to be used for all contacts in group wether it was sent or not to help in reporting to clients
-        String messageIdGlobal = UUID.randomUUID().toString().toUpperCase().substring(0, 40);
+        String messageIdGlobal = UUID.randomUUID().toString().toUpperCase().substring(0, 20);
         /**
          *Number of unsuccessful messages,this will be used to add back to customer's credit since it
          * has been deducted already before list is processed here
@@ -63,7 +65,8 @@ public class BaseMessageSender {
         /**
          * find creditBalance before transaction
          */
-        Date dateBulkMessageRequestCame = Date.from(Instant.now());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(CustomDateFormat.getDateFormat());
+        String dateBulkMessageRequestCame = simpleDateFormat.format(Date.from(Instant.now()));
         int creditBefore = userDocRepository.findByUserName(groupContactsDocsList.get(0).getUserName()).getCreditBalance();
 
         for (GroupContactsDoc singleContact : groupContactsDocsList) {
@@ -79,8 +82,10 @@ public class BaseMessageSender {
             String contactRecipientPhoneNum = singleContact.getContactPhoneNum();
             SMSSenderRequest smsSenderRequest = new SMSSenderRequest(senderIdGlobal,messageToSendGlobal,contactRecipientPhoneNum);
             String groupId = singleContact.getGroupId();
+            //SimpleDateFormat simpleDateFormat = new SimpleDateFormat(CustomDateFormat.getDateFormat());
+            String dateNow = simpleDateFormat.format(Date.from(Instant.now()));
 
-            MessagesDetailedReportDoc messagesDetailedReportDoc= new MessagesDetailedReportDoc(Date.from(Instant.now()),
+            MessagesDetailedReportDoc messagesDetailedReportDoc= new MessagesDetailedReportDoc(dateNow,
                     messageIdGlobal,
                     contactRecipientPhoneNum,
                     senderIdGlobal,
