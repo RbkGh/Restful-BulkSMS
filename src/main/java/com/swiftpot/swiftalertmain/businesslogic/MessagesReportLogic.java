@@ -9,6 +9,7 @@ import com.swiftpot.swiftalertmain.repositories.MessagesReportDocRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ import java.util.List;
  *         <Rodney Kwabena Boachie at [rodney@swiftpot.com,rbk.unlimited@gmail.com]> on
  *         02-Oct-16 @ 7:14 PM
  */
+@Service
 public class MessagesReportLogic {
     Logger log = LoggerFactory.getLogger(getClass());
     @Autowired

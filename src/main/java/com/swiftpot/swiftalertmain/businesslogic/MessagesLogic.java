@@ -11,6 +11,7 @@ import com.swiftpot.swiftalertmain.services.BulkMessageSenderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
  *         <Rodney Kwabena Boachie at [rodney@swiftpot.com,rbk.unlimited@gmail.com]> on
  *         02-Oct-16 @ 2:53 PM
  */
+@Service
 public class MessagesLogic {
 
     Logger log = LoggerFactory.getLogger(getClass());

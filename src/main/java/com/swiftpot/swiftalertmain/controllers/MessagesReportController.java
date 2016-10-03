@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.websocket.server.PathParam;
 
@@ -15,6 +16,7 @@ import javax.websocket.server.PathParam;
  *         <Rodney Kwabena Boachie at [rodney@swiftpot.com,rbk.unlimited@gmail.com]> on
  *         02-Oct-16 @ 7:13 PM
  */
+@RestController
 @RequestMapping("/api/v2/messages")
 public class MessagesReportController {
 
