@@ -42,7 +42,7 @@ public class GroupsLogic {
     }
 
     public OutgoingPayload updateOneGroup(GroupsDoc groupsDoc) {
-        log.info("Update One GroupName Request : {}", groupsDoc);
+        log.info("Update One GroupName Request : {}", g.toJson(groupsDoc));
         OutgoingPayload outgoingPayload;
 
         try {
@@ -61,7 +61,7 @@ public class GroupsLogic {
     }
 
     public OutgoingPayload deleteOneGroup(GroupsDoc groupsDoc) {
-        log.info("Delete One GroupName Request : {}", groupsDoc);
+        log.info("Delete One GroupName Request : {}", g.toJson(groupsDoc));
         OutgoingPayload outgoingPayload;
 
         try {
@@ -81,7 +81,7 @@ public class GroupsLogic {
     }
 
     public OutgoingPayload createOneGroup(GroupsDoc groupsDoc) {
-        log.info("Create One GroupName Request : {}", groupsDoc);
+        log.info("Create One GroupName Request : {}", g.toJson(groupsDoc));
         /**
          * generate 40char groupId and save to db,this is used in both MessageReport and MessageReportDetailed for querying
          */
