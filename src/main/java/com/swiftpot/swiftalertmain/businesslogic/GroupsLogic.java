@@ -2,6 +2,7 @@ package com.swiftpot.swiftalertmain.businesslogic;
 
 import com.google.gson.Gson;
 import com.swiftpot.swiftalertmain.db.model.GroupsDoc;
+import com.swiftpot.swiftalertmain.db.model.UserDoc;
 import com.swiftpot.swiftalertmain.helpers.CustomDateFormat;
 import com.swiftpot.swiftalertmain.models.ErrorOutgoingPayload;
 import com.swiftpot.swiftalertmain.models.OutgoingPayload;
@@ -101,21 +102,29 @@ public class GroupsLogic {
         String groupNameFromUser = groupsDoc.getGroupName();
 
         try{
-        GroupsDoc groupsDocFromDb = groupsDocRepository.findByGroupName(groupNameFromUser);
-        String groupsDocFromDBgroupName = groupsDocFromDb.getGroupName();
-        if(groupsDocFromDBgroupName == groupNameFromUser){
+
+        if(isGroupNamePresentAlrady(groupNameFromUser)){
             //dont save document,return to user that it was present already
             outgoingPayload = new ErrorOutgoingPayload("Group Name exists already");
         }else{
             GroupsDoc newlyCreatedGroup = groupsDocRepository.save(groupsDoc);
             outgoingPayload = new SuccessfulOutgoingPayload("Created Successfully",newlyCreatedGroup);
         }
-        }catch (NullPointerException e){
-            outgoingPayload = new ErrorOutgoingPayload("Group Name exists already");
         }catch (Exception e ){
             outgoingPayload = new ErrorOutgoingPayload("Computers make mistakes too,bruh");
         }
 
         return outgoingPayload;
+    }
+
+    boolean isGroupNamePresentAlrady(String groupName){
+        boolean isGroupNamePresentAlrady = false;
+        GroupsDoc groupsDoc = groupsDocRepository.findByGroupName(groupName);
+        if(!(groupsDoc == null)){
+            isGroupNamePresentAlrady = true;
+        }else{
+            //return false;
+        }
+        return isGroupNamePresentAlrady;
     }
 }
