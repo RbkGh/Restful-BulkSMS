@@ -9,6 +9,11 @@ public class ErrorOutgoingPayload extends OutgoingPayload {
     public ErrorOutgoingPayload() {
     }
 
+    public ErrorOutgoingPayload(String message) {
+        this.status = "11";
+        this.message = message;
+        this.responseObject = null;
+    }
     public ErrorOutgoingPayload(Object responseObject) {
         this.status = "11";
         this.message = "Error";

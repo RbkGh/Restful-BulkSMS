@@ -13,7 +13,11 @@ public class BulkGroupContactsCreationRequest {
 
     String groupId;
 
+    String userName;
+
     List<GroupContactsDoc> contactsList;
+
+    public BulkGroupContactsCreationRequest(){}
 
     public BulkGroupContactsCreationRequest(String groupId, List<GroupContactsDoc> contactsList) {
         this.groupId = groupId;
@@ -26,6 +30,14 @@ public class BulkGroupContactsCreationRequest {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public List<GroupContactsDoc> getContactsList() {

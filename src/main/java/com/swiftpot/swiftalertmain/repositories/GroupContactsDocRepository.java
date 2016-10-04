@@ -2,6 +2,7 @@ package com.swiftpot.swiftalertmain.repositories;
 
 import com.swiftpot.swiftalertmain.db.model.GroupContactsDoc;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,7 +13,8 @@ import java.util.List;
  *         01-Oct-16 @ 10:14 PM
  */
 @Repository
-public interface GroupContactsDocRepository extends MongoRepository<GroupContactsDoc,String> {
+public interface GroupContactsDocRepository extends MongoRepository<GroupContactsDoc,String>{
 
     List<GroupContactsDoc> findByGroupId(String groupId);
+    GroupContactsDoc findByContactPhoneNum(String contactPhoneNum);
 }

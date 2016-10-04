@@ -40,4 +40,9 @@ public class GroupContactsController {
         return groupContactsLogic.updateSingleGroupContact(groupContactsDoc);
     }
 
+    @RequestMapping(path = "/contacts/{groupId}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public OutgoingPayload getAllGroupContactsByGroupId(@PathVariable String groupId){
+        return groupContactsLogic.getAllGroupContactsByGroupId(groupId);
+    }
+
 }

@@ -1,12 +1,14 @@
 package com.swiftpot.swiftalertmain.businesslogic;
 
 import com.google.gson.Gson;
+import com.swiftpot.swiftalertmain.db.model.GroupContactsDoc;
 import com.swiftpot.swiftalertmain.db.model.GroupsDoc;
 import com.swiftpot.swiftalertmain.db.model.UserDoc;
 import com.swiftpot.swiftalertmain.helpers.CustomDateFormat;
 import com.swiftpot.swiftalertmain.models.ErrorOutgoingPayload;
 import com.swiftpot.swiftalertmain.models.OutgoingPayload;
 import com.swiftpot.swiftalertmain.models.SuccessfulOutgoingPayload;
+import com.swiftpot.swiftalertmain.repositories.GroupContactsDocRepository;
 import com.swiftpot.swiftalertmain.repositories.GroupsDocRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +31,10 @@ public class GroupsLogic {
     Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     Gson g;
-
     @Autowired
     GroupsDocRepository groupsDocRepository;
+    @Autowired
+    GroupContactsDocRepository groupContactsDocRepository;
 
     public OutgoingPayload getAllGroups(String userName) {
         log.info("GetAllGroups Registered To Username Request :" + userName);
@@ -74,6 +77,20 @@ public class GroupsLogic {
             boolean isDocumentPresent = groupsDocRepository.exists(groupsDoc.getId());
             if (isDocumentPresent) {
                 groupsDocRepository.delete(groupsDoc);
+
+                /**
+                 * initiate a new Thread inline to delete all contacts of group asynchrounously
+                 */
+                new Thread(() -> {
+                    List<GroupContactsDoc> groupContactsDocsList = groupContactsDocRepository.findByGroupId(groupsDoc.getGroupId());
+                    if(!(groupContactsDocsList.isEmpty())){
+                        log.info("Number of GroupContacts To Delete = "+groupContactsDocsList.size());
+                        groupContactsDocRepository.delete(groupContactsDocsList);
+                        log.info(groupContactsDocsList.size()+" Contacts Deleted Successfully");
+                    } else {
+                        log.info("Number of GroupContacts To Delete = "+groupContactsDocsList.size());
+                    }
+                }).start();
                 outgoingPayload = new SuccessfulOutgoingPayload("Deleted Successfully");
             } else {
                 outgoingPayload = new ErrorOutgoingPayload("Entity does not exist,bro!!:)");
@@ -103,7 +120,7 @@ public class GroupsLogic {
 
         try{
 
-        if(isGroupNamePresentAlrady(groupNameFromUser)){
+        if(isGroupNamePresentAlready(groupNameFromUser)){
             //dont save document,return to user that it was present already
             outgoingPayload = new ErrorOutgoingPayload("Group Name exists already");
         }else{
@@ -117,7 +134,7 @@ public class GroupsLogic {
         return outgoingPayload;
     }
 
-    boolean isGroupNamePresentAlrady(String groupName){
+    boolean isGroupNamePresentAlready(String groupName){
         boolean isGroupNamePresentAlrady = false;
         GroupsDoc groupsDoc = groupsDocRepository.findByGroupName(groupName);
         if(!(groupsDoc == null)){
