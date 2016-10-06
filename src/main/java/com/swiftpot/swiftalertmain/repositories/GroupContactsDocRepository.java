@@ -16,5 +16,5 @@ import java.util.List;
 public interface GroupContactsDocRepository extends MongoRepository<GroupContactsDoc,String>{
 
     List<GroupContactsDoc> findByGroupId(String groupId);
-    GroupContactsDoc findByContactPhoneNum(String contactPhoneNum);
+    GroupContactsDoc findByContactPhoneNumAndUserName(String contactPhoneNum,String userName);
 }

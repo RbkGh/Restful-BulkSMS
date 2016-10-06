@@ -43,7 +43,7 @@ public class GroupContactsLogic {
         try {
 
             if (isGroupIdPresentInGroupsDocument(groupContactsDoc.getGroupId())) {
-                if (isContactPhoneNumberAlreadyPresent(groupContactsDoc.getContactPhoneNum())) {
+                if (isContactPhoneNumberAndUsernameAlreadyPresent(groupContactsDoc.getContactPhoneNum(), groupContactsDoc.getUserName())) {
                     outgoingPayload = new ErrorOutgoingPayload("PhoneNumber of Contact Already Exists");
                 } else {
                     GroupContactsDoc groupsDocFinal = groupContactsDocRepository.save(groupContactsDoc);
@@ -66,7 +66,7 @@ public class GroupContactsLogic {
         OutgoingPayload outgoingPayload;
 
         String groupId = bulkGroupContactsCreationRequest.getGroupId();
-        String userName = bulkGroupContactsCreationRequest.getGroupId();
+        String userName = bulkGroupContactsCreationRequest.getUserName();
         List<GroupContactsDoc> iterableGroupContacts = bulkGroupContactsCreationRequest.getContactsList();
         log.info("Raw contacts List number before duplicate numbers removed = " + iterableGroupContacts.size());
 
@@ -77,29 +77,19 @@ public class GroupContactsLogic {
             groupContactsDocElement.setGroupId(groupId);
             groupContactsDocElement.setUserName(userName);
             newlySetGroupIdAndUserNameContactsDoc.add(groupContactsDocElement);
-            /**
-             * add first element by default
-             */
-
-
         }
-        log.info("Newly sorted list,with duplicate phoneNumbers removed = " + newlySetGroupIdAndUserNameContactsDoc.size());
+        log.info("Newly sorted list,with set groupId and Username = " + newlySetGroupIdAndUserNameContactsDoc.size());
+        //sort and remove duplicates Initial
+        List<GroupContactsDoc> removeInitialDuplicates = removeDuplicateContactsInitial(newlySetGroupIdAndUserNameContactsDoc);
+        log.info("Newly sorted List with Duplicates Removed Stage1 = " + removeInitialDuplicates.size() + " contacts");
 
-        //sort and remove duplicates
-        List<GroupContactsDoc> incomingGroupContactsListNotFromDB = newlySetGroupIdAndUserNameContactsDoc;
-
-        List<GroupContactsDoc> contactsListFromDB = getGroupContactsListFromDbUsingGroupId(groupId);
-        int noOfSavedContacts = 0;
-        //if GroupContactsDoc list from db number !=0,then try to remove duplicates if any,before saving
-        if (contactsListFromDB.size() != 0) {
-            List<GroupContactsDoc> groupContactsDocListFinalToBeSaved =
-                    removeDuplicatesFromIncomingListByCheckingDBList(incomingGroupContactsListNotFromDB, contactsListFromDB, groupId);
-            log.info("no of final list to save in db = " + groupContactsDocListFinalToBeSaved.size());
-            noOfSavedContacts = noOfContactsCreatedSuccessfully(groupContactsDocListFinalToBeSaved);
-        }
+        List<GroupContactsDoc> groupContactsDocListFinallySaved =
+                removeDuplicatesFromIncomingListByCheckingDBListAndSave(removeInitialDuplicates);
+        int noOfSavedContacts = groupContactsDocListFinallySaved.size();
+        log.info("no of final list saved in db = " + noOfSavedContacts);
 
         if (noOfSavedContacts == 0) {
-            outgoingPayload = new SuccessfulOutgoingPayload("Nothing was saved because there are duplicate numbers alredy", null);
+            outgoingPayload = new SuccessfulOutgoingPayload("Nothing was saved because the contacts exist already", null);
         } else {
             outgoingPayload = new SuccessfulOutgoingPayload(noOfSavedContacts + " saved Successfully");
         }
@@ -113,8 +103,13 @@ public class GroupContactsLogic {
         OutgoingPayload outgoingPayload;
 
         try {
-            groupContactsDocRepository.delete(id);
-            outgoingPayload = new OutgoingPayload("Deleted Successfully", null);
+            if (!groupContactsDocRepository.exists(id)) {
+                outgoingPayload = new ErrorOutgoingPayload("Id does not exist");
+            } else {
+                groupContactsDocRepository.delete(id);
+                outgoingPayload = new SuccessfulOutgoingPayload("Deleted Successfully", null);
+            }
+
         } catch (Exception e) {
             outgoingPayload = new ErrorOutgoingPayload("Could not delete");
         }
@@ -128,39 +123,84 @@ public class GroupContactsLogic {
         try {
             boolean isDocumentPresent = groupContactsDocRepository.exists(groupContactsDoc.getId());
             if (isDocumentPresent) {
-                GroupContactsDoc groupsContactDocFinal = groupContactsDocRepository.save(groupContactsDoc);
-                outgoingPayload = new SuccessfulOutgoingPayload(groupsContactDocFinal);
+
+                //Check to make sure no duplicate phoneNumber is being inserted when updating,
+                //Find entity to update using its id since any other value could be an update but the id will remain same
+                GroupContactsDoc groupContactsDocFromDb = groupContactsDocRepository.findOne(groupContactsDoc.getId());
+
+                boolean isPhoneNumbersSame = (groupContactsDoc.getContactPhoneNum().trim().equalsIgnoreCase(groupContactsDocFromDb.getContactPhoneNum().trim()));
+                log.info("incomingPhoneNumber ="+groupContactsDoc.getContactPhoneNum().trim());
+                log.info("DBPhoneNumber ="+groupContactsDocFromDb.getContactPhoneNum().trim());
+                log.info("isPhoneNumbersSame ="+isPhoneNumbersSame);
+                if (!(isPhoneNumbersSame)) {
+                    log.info("new Phone Numbers are not the same");
+                    boolean isGroupIdAndUserNamePresentForNewPhoneNumberToBeUpdated = isContactPhoneNumberAndUsernameAlreadyPresent(groupContactsDoc.getContactPhoneNum(), groupContactsDoc.getUserName());
+                    log.info("isGroupIdAndUserNamePresentForNewPhoneNumberToBeUpdated = "+isGroupIdAndUserNamePresentForNewPhoneNumberToBeUpdated);
+                    if(isGroupIdAndUserNamePresentForNewPhoneNumberToBeUpdated){
+                        outgoingPayload = new ErrorOutgoingPayload("Could Not Update Because The New PhoneNumber Exists Already ");
+                    }else {
+                        GroupContactsDoc groupsContactDocFinal = groupContactsDocRepository.save(groupContactsDoc);
+                        outgoingPayload = new SuccessfulOutgoingPayload(groupsContactDocFinal);
+                    }
+                } else {
+
+                    //Once phoneNumbers are same,no need to check if new phoneNumber is existing in DB
+                    GroupContactsDoc groupsContactDocFinal = groupContactsDocRepository.save(groupContactsDoc);
+                    outgoingPayload = new SuccessfulOutgoingPayload(groupsContactDocFinal);
+                }
+
             } else {
                 outgoingPayload = new ErrorOutgoingPayload("Entity does not exist,bro!!:)");
             }
         } catch (Exception e) {
-            log.info("Exception cause : " + e.getCause().getMessage());
+            e.printStackTrace();
             outgoingPayload = new ErrorOutgoingPayload("Could Not Update entity with id : {}.I don't think id exists,bruh :)", groupContactsDoc.getId());
         }
         return outgoingPayload;
     }
 
-    int noOfContactsCreatedSuccessfully(List<GroupContactsDoc> groupContactsDocList) {
+    private ArrayList<GroupContactsDoc> removeDuplicateContactsInitial(List<GroupContactsDoc> contacts) {
+        log.info("removed duplicates before executing removeDuplicateContactsBlock::: " + g.toJson(contacts) + " length:::" + contacts.size());
+        LinkedHashSet<String> noDuplicateLinkedHashSet = new LinkedHashSet<>(0);
+        ArrayList<GroupContactsDoc> noDuplicateArrayList = new ArrayList<>(0);
+        for (GroupContactsDoc singleContact : contacts) {
+            String phoneNumber = singleContact.getContactPhoneNum();
+
+            if (noDuplicateLinkedHashSet.add(phoneNumber) == false) {
+                //duplicate culprit,hence do nothing
+
+            } else {
+                noDuplicateArrayList.add(singleContact);
+            }
 
 
-        List<GroupContactsDoc> groupContactsDocsSavedList = groupContactsDocRepository.save(groupContactsDocList);
+        }
+
+        log.info("removed duplicates after executing removeDuplicateContactsBlock::: " + g.toJson(noDuplicateArrayList) + " length:::" + noDuplicateArrayList.size());
 
 
-        return groupContactsDocsSavedList.size();
+        return noDuplicateArrayList;
+
     }
 
-    List<GroupContactsDoc> removeDuplicatesFromIncomingListByCheckingDBList(List<GroupContactsDoc> incomingGroupContactsListNotFromDB,
-                                                                            List<GroupContactsDoc> contactsListFromDB,
-                                                                            String groupId) {
+    List<GroupContactsDoc> removeDuplicatesFromIncomingListByCheckingDBListAndSave(List<GroupContactsDoc> incomingGroupContactsListNotFromDB
+    ) {
         List<GroupContactsDoc> finalContactsList = new ArrayList<>(0);
         for (GroupContactsDoc groupContactsDocNotFromDB : incomingGroupContactsListNotFromDB) {
-            for (GroupContactsDoc contactDocFromDB : contactsListFromDB) {
-                /**
-                 * if it does not match any,then add to finalContactsList,if it matches,just don't add to finalList
-                 */
-                if (!(groupContactsDocNotFromDB.getContactPhoneNum() == contactDocFromDB.getContactPhoneNum())) {
+
+            String contactPhoneNumber = groupContactsDocNotFromDB.getContactPhoneNum();
+            String userName = groupContactsDocNotFromDB.getUserName();
+            if (!isContactPhoneNumberAndUsernameAlreadyPresent(contactPhoneNumber, userName)) {
+                //we can go ahead to save now else,do nothing since it exists already
+                try {
+                    groupContactsDocRepository.save(groupContactsDocNotFromDB);
                     finalContactsList.add(groupContactsDocNotFromDB);
+                } catch (Exception e) {
+                    //do not add to List since it was not saved in db as error occured
+                    log.info("{}", g.toJson(groupContactsDocNotFromDB) + " not saved ");
                 }
+
+
             }
         }
 
@@ -196,9 +236,15 @@ public class GroupContactsLogic {
         return isGroupIdPresentInGroupsDocument;
     }
 
-    boolean isContactPhoneNumberAlreadyPresent(String contactPhoneNum) {
+    /**
+     * @param contactPhoneNum
+     * @param userName
+     * @return boolean
+     * Check PhoneNumber And Username because A different user can save same number and it should still be valid
+     */
+    boolean isContactPhoneNumberAndUsernameAlreadyPresent(String contactPhoneNum, String userName) {
         boolean isContactPhoneNumberAlreadyPresent = false;
-        GroupContactsDoc groupContactsDoc = groupContactsDocRepository.findByContactPhoneNum(contactPhoneNum);
+        GroupContactsDoc groupContactsDoc = groupContactsDocRepository.findByContactPhoneNumAndUserName(contactPhoneNum, userName);
         if (!(groupContactsDoc == null)) {
             isContactPhoneNumberAlreadyPresent = true;
         }
