@@ -23,8 +23,13 @@ public class MessagesReportController {
     @Autowired
     MessagesReportLogic messagesReportLogic;
 
-    @RequestMapping(path = "/report/{groupId}",method = RequestMethod.GET,consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    OutgoingPayload getMessagesReport(@PathVariable String groupId){
-        return messagesReportLogic.getMessagesReport(groupId);
+    @RequestMapping(path = "/report/{userName}",method = RequestMethod.GET,consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    OutgoingPayload getAllMessagesReportByUserName(@PathVariable String userName){
+        return messagesReportLogic.getAllMessagesReportByUserName(userName);
+    }
+
+    @RequestMapping(path = "/report/detailed/{messageId}",method = RequestMethod.GET,consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    OutgoingPayload getAllMessagesReportInDetailByMessageId(@PathVariable String messageId){
+        return messagesReportLogic.getAllMessagesReportInDetailByMessageId(messageId);
     }
 }

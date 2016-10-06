@@ -15,4 +15,5 @@ import java.util.List;
 public interface MessagesReportDocRepository extends MongoRepository<MessagesReportDoc,String> {
 
     List<MessagesReportDoc> findByGroupId(String groupId);
+    List<MessagesReportDoc> findByUserName(String userName);
 }

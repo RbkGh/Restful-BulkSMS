@@ -15,6 +15,8 @@ public class MessagesReportDoc {
     @Id
     String id;
 
+    String userName;
+
     String dateCreated;
 
     String messageId;
@@ -33,6 +35,13 @@ public class MessagesReportDoc {
     public MessagesReportDoc() {
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
     public String getId() {
         return id;

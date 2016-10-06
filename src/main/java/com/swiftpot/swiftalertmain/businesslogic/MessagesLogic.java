@@ -58,7 +58,7 @@ public class MessagesLogic {
             GroupContactsDoc groupContactsDoc = new GroupContactsDoc(userName,"","",contactPhoneNum,"");
             groupContactsDocsList.add(groupContactsDoc);
 
-            if(baseMessageSender.didEachMessageSendWithoutAnyError(groupContactsDocsList, message, senderId,creditBeforeAnyDeduction)){
+            if(baseMessageSender.didEachMessageSendWithoutAnyError(groupContactsDocsList, message, senderId,creditBeforeAnyDeduction,userName)){
                 outgoingPayload = new SuccessfulOutgoingPayload("Message Sent Successfully");
             }else{
                 outgoingPayload = new ErrorOutgoingPayload("Message Not Sent");
@@ -81,7 +81,7 @@ public class MessagesLogic {
         String message = bulkMessagesRequest.getMessage();
         int numberofMessagesToSend = getNumberOfContactsForSpecificGroup(groupId);
 
-        if (!(isCreditBalanceEnough(bulkMessagesRequest.getUserName(), numberofMessagesToSend))) {
+        if (!(isCreditBalanceEnough(userName, numberofMessagesToSend))) {
             outgoingPayload = new ErrorOutgoingPayload("Insufficient Balance", null);
         } else {
             int noOfCreditsToDeduct = groupContactsDocRepository.findByGroupId(groupId).size();
@@ -89,10 +89,11 @@ public class MessagesLogic {
              * deduct credit before transaction
              */
             int creditBeforeAnyDeduction = deductCreditBeforeSendingMessageAndUpdateInDB(noOfCreditsToDeduct, userName);
-            List<GroupContactsDoc> groupContactsDocsList = findContactsInGroupById(groupId);
+            List<GroupContactsDoc> groupContactsDocsList = findContactsInGroupByGroupId(groupId);
+
 
             new Thread(() -> {
-                baseMessageSender.didEachMessageSendWithoutAnyError(groupContactsDocsList, message, senderId,creditBeforeAnyDeduction);
+                baseMessageSender.didEachMessageSendWithoutAnyError(groupContactsDocsList, message, senderId,creditBeforeAnyDeduction,userName);
             }).start();
 
             outgoingPayload = new SuccessfulOutgoingPayload("Messages Sent Immediately");
@@ -102,7 +103,7 @@ public class MessagesLogic {
         return outgoingPayload;
     }
 
-    List<GroupContactsDoc> findContactsInGroupById(String groupId) {
+    List<GroupContactsDoc> findContactsInGroupByGroupId(String groupId) {
         return groupContactsDocRepository.findByGroupId(groupId);
     }
 

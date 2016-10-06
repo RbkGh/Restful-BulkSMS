@@ -56,10 +56,11 @@ public class BaseMessageSender {
      * @param senderId @NotNull
      * @return
      */
-    public boolean didEachMessageSendWithoutAnyError(List<GroupContactsDoc> groupContactsDocsList,String message, String senderId,int creditBefore) {
+    public boolean didEachMessageSendWithoutAnyError(List<GroupContactsDoc> groupContactsDocsList,String message, String senderId,int creditBefore,String userName) {
 
         boolean wereAllMessagesSent;
         Gson gson = new Gson();
+        String userNameGlobal = userName;
         // Set message which will be used for all contacts in group
         String messageToSendGlobal = message;
         // Set SenderId to be used for all contacts in group
@@ -100,7 +101,8 @@ public class BaseMessageSender {
                     messageIdGlobal,
                     contactRecipientPhoneNum,
                     senderIdGlobal,
-                    groupId);
+                    groupId,
+                    userNameGlobal);
 
             if(!smsSender.isMessageSendingSuccessful(smsSenderRequest)){
                 unsuccessfulMessagesCount.add(false);
@@ -122,12 +124,8 @@ public class BaseMessageSender {
 
         if(!unsuccessfulMessagesCount.isEmpty()){
             int numberOfCreditBalanceToReturnToCustomer = unsuccessfulMessagesCount.size();
-            /**
-             * get first contact's userName,all the same,but choose first one since list may,could and will contain only one
-             * when its a single message
-             */
-            String userName = groupContactsDocsList.get(0).getUserName();
-            returnCreditBalanceToCustomer(numberOfCreditBalanceToReturnToCustomer, userName);
+
+            returnCreditBalanceToCustomer(numberOfCreditBalanceToReturnToCustomer, userNameGlobal);
 
 
             wereAllMessagesSent = false;
@@ -157,6 +155,7 @@ public class BaseMessageSender {
 
         int totalNumOfMessagesTried = groupContactsDocsList.size();
 
+        messagesReportDoc.setUserName(userNameGlobal);
         messagesReportDoc.setDateCreated(dateBulkMessageRequestCame);
         messagesReportDoc.setMessageId(messageIdGlobal);
         messagesReportDoc.setGroupName(groupName);

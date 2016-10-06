@@ -29,16 +29,19 @@ public class MessagesDetailedReportDoc {
 
     String senderId;
 
+    String userName;
+
 
     public MessagesDetailedReportDoc() {
     }
 
-    public MessagesDetailedReportDoc(String dateCreated, String messageId, String recipientNum, String senderId,String groupId) {
+    public MessagesDetailedReportDoc(String dateCreated, String messageId, String recipientNum, String senderId,String groupId,String userName) {
         this.dateCreated = dateCreated;
         this.messageId = messageId;
         this.recipientNum = recipientNum;
         this.senderId = senderId;
         this.groupId = groupId;
+        this.userName = userName;
     }
 
     public String getId() {
@@ -96,5 +99,13 @@ public class MessagesDetailedReportDoc {
 
     public void setSenderId(String senderId) {
         this.senderId = senderId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

@@ -1,10 +1,12 @@
 package com.swiftpot.swiftalertmain.businesslogic;
 
 import com.google.gson.Gson;
+import com.swiftpot.swiftalertmain.db.model.MessagesDetailedReportDoc;
 import com.swiftpot.swiftalertmain.db.model.MessagesReportDoc;
 import com.swiftpot.swiftalertmain.models.ErrorOutgoingPayload;
 import com.swiftpot.swiftalertmain.models.OutgoingPayload;
 import com.swiftpot.swiftalertmain.models.SuccessfulOutgoingPayload;
+import com.swiftpot.swiftalertmain.repositories.MessagesDetailedReportDocRepository;
 import com.swiftpot.swiftalertmain.repositories.MessagesReportDocRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,13 +28,28 @@ public class MessagesReportLogic {
 
     @Autowired
     MessagesReportDocRepository messagesReportDocRepository;
+    @Autowired
+    MessagesDetailedReportDocRepository messagesDetailedReportDocRepository;
 
-    public OutgoingPayload getMessagesReport(String groupId) {
-        log.info("getMessagesReportRequest groupId = " + groupId);
+    public OutgoingPayload getAllMessagesReportByUserName(String userName) {
+        log.info("getMessagesReportRequest userName = " + userName);
         OutgoingPayload outgoingPayload;
         try {
-            List<MessagesReportDoc> messagesReportDocsList = messagesReportDocRepository.findByGroupId(groupId);
+            List<MessagesReportDoc> messagesReportDocsList = messagesReportDocRepository.findByUserName(userName);
             outgoingPayload = new SuccessfulOutgoingPayload(messagesReportDocsList);
+        } catch (Exception e) {
+            outgoingPayload = new ErrorOutgoingPayload("Group Id does not exist");
+        }
+
+        return outgoingPayload;
+    }
+
+    public OutgoingPayload getAllMessagesReportInDetailByMessageId(String messageId) {
+        log.info("getMessagesReportRequest messageId = " + messageId);
+        OutgoingPayload outgoingPayload;
+        try {
+            List<MessagesDetailedReportDoc> messagesDetailedReportDocList = messagesDetailedReportDocRepository.findByMessageId(messageId);
+            outgoingPayload = new SuccessfulOutgoingPayload(messagesDetailedReportDocList);
         } catch (Exception e) {
             outgoingPayload = new ErrorOutgoingPayload("Group Id does not exist");
         }
