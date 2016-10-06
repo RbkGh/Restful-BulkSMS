@@ -44,7 +44,14 @@ public class SMSSenderSwiftAlertSMSGHImpl implements SMSSender {
         // Instance of the Messaging API
         MessagingApi messagingApi = new MessagingApi(host);
         try {
-            MessageResponse response = messagingApi.sendQuickMessage("Wonsano",
+
+            String senderId = smsSenderRequest.getSenderId();
+            if(senderId.length() > 11){
+                senderId = senderId.substring(0,11);
+
+            }
+            log.info("senderId String ="+senderId);
+            MessageResponse response = messagingApi.sendQuickMessage(senderId,
                     smsSenderRequest.getRecipientPhoneNum(), smsSenderRequest.getMessage(), null);
             log.info("{}", new Gson().toJson(response));
             System.out.println("Server Response Status " + response.getStatus());

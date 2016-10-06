@@ -106,9 +106,9 @@ public class GroupsLogic {
     public OutgoingPayload createOneGroup(GroupsDoc groupsDoc) {
         log.info("Create One GroupName Request : {}", g.toJson(groupsDoc));
         /**
-         * generate 20char groupId and save to db,this is used in both MessageReport and MessageReportDetailed for querying
+         * generate 36char groupId,as its the largest uuid can gen, and save to db,this is used in both MessageReport and MessageReportDetailed for querying
          */
-        String groupId = UUID.randomUUID().toString().toUpperCase().substring(0, 20);
+        String groupId = UUID.randomUUID().toString().toUpperCase().substring(0, 36);
         groupsDoc.setGroupId(groupId);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(CustomDateFormat.getDateFormat());
         String dateNow = simpleDateFormat.format(Date.from(Instant.now()));

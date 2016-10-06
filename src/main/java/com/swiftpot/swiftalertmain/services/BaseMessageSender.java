@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -48,26 +49,36 @@ public class BaseMessageSender {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    public boolean didEachMessageSendWithoutAnyError(List<GroupContactsDoc> groupContactsDocsList, String message, String senderId) {
-        boolean wereAllMessagesSent =false;
+    /**
+     *
+     * @param groupContactsDocsList @NotNull
+     * @param message @NotNull
+     * @param senderId @NotNull
+     * @return
+     */
+    public boolean didEachMessageSendWithoutAnyError(List<GroupContactsDoc> groupContactsDocsList,String message, String senderId,int creditBefore) {
+
+        boolean wereAllMessagesSent;
         Gson gson = new Gson();
         // Set message which will be used for all contacts in group
         String messageToSendGlobal = message;
         // Set SenderId to be used for all contacts in group
         String senderIdGlobal = senderId;
         // Set MessageId to be used for all contacts in group wether it was sent or not to help in reporting to clients
-        String messageIdGlobal = UUID.randomUUID().toString().toUpperCase().substring(0, 20);
+        String messageIdGlobal = UUID.randomUUID().toString().toUpperCase().substring(0, 36);
+        log.info("Message = "+messageToSendGlobal+" SenderId = "+senderIdGlobal+" MessageIdGlobal ="+messageIdGlobal);
         /**
          *Number of unsuccessful messages,this will be used to add back to customer's credit since it
          * has been deducted already before list is processed here
          */
         ArrayList<Boolean> unsuccessfulMessagesCount = new ArrayList<>(0);
+        ArrayList<Boolean> successfulMessagesCount = new ArrayList<>(0);
         /**
          * find creditBalance before transaction
          */
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(CustomDateFormat.getDateFormat());
         String dateBulkMessageRequestCame = simpleDateFormat.format(Date.from(Instant.now()));
-        int creditBefore = userDocRepository.findByUserName(groupContactsDocsList.get(0).getUserName()).getCreditBalance();
+        log.info("Credit Before ="+creditBefore);
 
         for (GroupContactsDoc singleContact : groupContactsDocsList) {
             log.info("\n\n==========CONTACT (" + groupContactsDocsList.indexOf(singleContact)
@@ -102,6 +113,7 @@ public class BaseMessageSender {
                 /**
                  * Set Delivery Status to YES,since message was sent successfully
                  */
+                successfulMessagesCount.add(true);
                 messagesDetailedReportDoc.setDeliveryStatus(DeliveryStatus.YES.toString());
                 messagesDetailedReportDocRepository.save(messagesDetailedReportDoc);
             }
@@ -129,13 +141,20 @@ public class BaseMessageSender {
          * each message sent into the MessageReportDocDetailed Document
          *
          */
-        int creditAfter = userDocRepository.findByUserName(groupContactsDocsList.get(0).getUserName()).getCreditBalance();
+        int creditAfter = creditBefore - successfulMessagesCount.size();
         MessagesReportDoc messagesReportDoc = new MessagesReportDoc();
         String groupIdTemporary = groupContactsDocsList.get(0).getGroupId();
         /**
          * set groupName to Empty if finding by GroupId fails,since we are passing empty groupId for a single message,groupId can be empty in some cases
          */
-        String groupName = StringUtils.defaultIfEmpty(groupsDocRepository.findByGroupId(groupIdTemporary).getGroupName(), "");
+        String groupName;
+        try {
+            groupName = StringUtils.defaultIfEmpty(groupsDocRepository.findByGroupId(groupIdTemporary).getGroupName(), "");
+        }catch(NullPointerException e){
+            log.info("groupId not present,hence,set empty groupName in Nullpointer exception");
+            groupName ="";
+        }
+
         int totalNumOfMessagesTried = groupContactsDocsList.size();
 
         messagesReportDoc.setDateCreated(dateBulkMessageRequestCame);

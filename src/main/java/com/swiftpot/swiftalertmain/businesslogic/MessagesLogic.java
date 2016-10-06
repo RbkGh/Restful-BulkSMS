@@ -7,7 +7,6 @@ import com.swiftpot.swiftalertmain.models.*;
 import com.swiftpot.swiftalertmain.repositories.GroupContactsDocRepository;
 import com.swiftpot.swiftalertmain.repositories.UserDocRepository;
 import com.swiftpot.swiftalertmain.services.BaseMessageSender;
-import com.swiftpot.swiftalertmain.services.BulkMessageSenderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,7 @@ public class MessagesLogic {
             /**
              * deduct credit before transaction
              */
-            deductCreditBeforeSendingMessageAndUpdateInDB(1,userName);
+            int creditBeforeAnyDeduction = deductCreditBeforeSendingMessageAndUpdateInDB(1,userName);
             /**
              * Initialize a List of GroupContactsDoc with a single element and pass to the BaseMessageSender service
              * to allow reporting of single messages too by setting empty strings to the firstName,lastName & groupId to
@@ -59,7 +58,7 @@ public class MessagesLogic {
             GroupContactsDoc groupContactsDoc = new GroupContactsDoc(userName,"","",contactPhoneNum,"");
             groupContactsDocsList.add(groupContactsDoc);
 
-            if(baseMessageSender.didEachMessageSendWithoutAnyError(groupContactsDocsList, message, senderId)){
+            if(baseMessageSender.didEachMessageSendWithoutAnyError(groupContactsDocsList, message, senderId,creditBeforeAnyDeduction)){
                 outgoingPayload = new SuccessfulOutgoingPayload("Message Sent Successfully");
             }else{
                 outgoingPayload = new ErrorOutgoingPayload("Message Not Sent");
@@ -79,6 +78,7 @@ public class MessagesLogic {
         String groupId = bulkMessagesRequest.getGroupId();
         String userName = bulkMessagesRequest.getUserName();
         String senderId = bulkMessagesRequest.getSenderId();
+        String message = bulkMessagesRequest.getMessage();
         int numberofMessagesToSend = getNumberOfContactsForSpecificGroup(groupId);
 
         if (!(isCreditBalanceEnough(bulkMessagesRequest.getUserName(), numberofMessagesToSend))) {
@@ -88,15 +88,14 @@ public class MessagesLogic {
             /**
              * deduct credit before transaction
              */
-            deductCreditBeforeSendingMessageAndUpdateInDB(noOfCreditsToDeduct, userName);
+            int creditBeforeAnyDeduction = deductCreditBeforeSendingMessageAndUpdateInDB(noOfCreditsToDeduct, userName);
             List<GroupContactsDoc> groupContactsDocsList = findContactsInGroupById(groupId);
 
-            BulkMessageSenderService bulkSMSSenderLogic = new BulkMessageSenderService(groupContactsDocsList,
-                    bulkMessagesRequest.getMessage(), senderId);
+            new Thread(() -> {
+                baseMessageSender.didEachMessageSendWithoutAnyError(groupContactsDocsList, message, senderId,creditBeforeAnyDeduction);
+            }).start();
 
-            new Thread(bulkSMSSenderLogic).start();
-
-            outgoingPayload = new SuccessfulOutgoingPayload("Messages Sent Successfully");
+            outgoingPayload = new SuccessfulOutgoingPayload("Messages Sent Immediately");
 
         }
 
@@ -121,12 +120,15 @@ public class MessagesLogic {
         return groupContactsDocRepository.findByGroupId(groupId).size();
     }
 
-    void deductCreditBeforeSendingMessageAndUpdateInDB(int noOfCreditsToDeduct, String userName) {
+    int deductCreditBeforeSendingMessageAndUpdateInDB(int noOfCreditsToDeduct, String userName) {
         UserDoc userDoc = userDocRepository.findByUserName(userName);
+        int currentCreditBalanceBeforeDeduction = userDoc.getCreditBalance();
         int newCreditBalance = userDoc.getCreditBalance() - noOfCreditsToDeduct;
         userDoc.setCreditBalance(newCreditBalance);
 
         userDocRepository.save(userDoc);
+
+        return currentCreditBalanceBeforeDeduction;
     }
 
 
