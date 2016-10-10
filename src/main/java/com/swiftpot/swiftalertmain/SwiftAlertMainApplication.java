@@ -38,16 +38,16 @@ public class SwiftAlertMainApplication extends SpringBootServletInitializer{
 	}
 
 	@Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurerAdapter() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                        registry.
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurerAdapter() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.
 						addMapping("/**").
-						allowedOrigins("*").allowedHeaders("Content-Type, x-requested-with, X-Custom-Header").
-				allowedMethods(String.valueOf(RequestMethod.PUT),
-						               "POST","GET","DELETE");
-            }
-        };
-    }
+						allowedOrigins("*").
+						allowedMethods(String.valueOf(RequestMethod.PUT),
+								"POST", "GET", "DELETE");
+			}
+		};
+	}
 }
