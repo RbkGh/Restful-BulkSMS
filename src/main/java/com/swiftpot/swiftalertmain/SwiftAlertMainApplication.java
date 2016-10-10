@@ -44,8 +44,8 @@ public class SwiftAlertMainApplication extends SpringBootServletInitializer{
             public void addCorsMappings(CorsRegistry registry) {
                         registry.
 						addMapping("/**").
-						allowedOrigins("*").
-						allowedMethods(String.valueOf(RequestMethod.PUT),
+						allowedOrigins("*").allowedHeaders("Content-Type, x-requested-with, X-Custom-Header").
+				allowedMethods(String.valueOf(RequestMethod.PUT),
 						               "POST","GET","DELETE");
             }
         };
