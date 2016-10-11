@@ -17,4 +17,5 @@ public interface GroupContactsDocRepository extends MongoRepository<GroupContact
 
     List<GroupContactsDoc> findByGroupId(String groupId);
     GroupContactsDoc findByContactPhoneNumAndUserName(String contactPhoneNum,String userName);
+    GroupContactsDoc findByContactPhoneNumAndUserNameAndGroupId(String contactPhoneNum,String userName,String groupId);
 }

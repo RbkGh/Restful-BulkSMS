@@ -43,7 +43,7 @@ public class GroupContactsLogic {
         try {
 
             if (isGroupIdPresentInGroupsDocument(groupContactsDoc.getGroupId())) {
-                if (isContactPhoneNumberAndUsernameAlreadyPresent(groupContactsDoc.getContactPhoneNum(), groupContactsDoc.getUserName())) {
+                if (isContactPhoneNumberAndUsernameAndGroupIdAlreadyPresent(groupContactsDoc.getContactPhoneNum(), groupContactsDoc.getUserName(), groupContactsDoc.getGroupId())) {
                     outgoingPayload = new ErrorOutgoingPayload("PhoneNumber of Contact Already Exists");
                 } else {
                     GroupContactsDoc groupsDocFinal = groupContactsDocRepository.save(groupContactsDoc);
@@ -134,7 +134,9 @@ public class GroupContactsLogic {
                 log.info("isPhoneNumbersSame ="+isPhoneNumbersSame);
                 if (!(isPhoneNumbersSame)) {
                     log.info("new Phone Numbers are not the same");
-                    boolean isGroupIdAndUserNamePresentForNewPhoneNumberToBeUpdated = isContactPhoneNumberAndUsernameAlreadyPresent(groupContactsDoc.getContactPhoneNum(), groupContactsDoc.getUserName());
+                    boolean isGroupIdAndUserNamePresentForNewPhoneNumberToBeUpdated = isContactPhoneNumberAndUsernameAndGroupIdAlreadyPresent(groupContactsDoc.getContactPhoneNum(),
+                            groupContactsDoc.getUserName(),
+                            groupContactsDoc.getGroupId());
                     log.info("isGroupIdAndUserNamePresentForNewPhoneNumberToBeUpdated = "+isGroupIdAndUserNamePresentForNewPhoneNumberToBeUpdated);
                     if(isGroupIdAndUserNamePresentForNewPhoneNumberToBeUpdated){
                         outgoingPayload = new ErrorOutgoingPayload("Could Not Update Because The New PhoneNumber Exists Already ");
@@ -190,7 +192,8 @@ public class GroupContactsLogic {
 
             String contactPhoneNumber = groupContactsDocNotFromDB.getContactPhoneNum();
             String userName = groupContactsDocNotFromDB.getUserName();
-            if (!isContactPhoneNumberAndUsernameAlreadyPresent(contactPhoneNumber, userName)) {
+            String groupId = groupContactsDocNotFromDB.getGroupId();
+            if (!isContactPhoneNumberAndUsernameAndGroupIdAlreadyPresent(contactPhoneNumber, userName, groupId)) {
                 //we can go ahead to save now else,do nothing since it exists already
                 try {
                     groupContactsDocRepository.save(groupContactsDocNotFromDB);
@@ -239,12 +242,13 @@ public class GroupContactsLogic {
     /**
      * @param contactPhoneNum
      * @param userName
+     * @param groupId
      * @return boolean
-     * Check PhoneNumber And Username because A different user can save same number and it should still be valid
+     * Check PhoneNumber And Username and groupId because A different user can save same number in a different group of his own and it should still be valid
      */
-    boolean isContactPhoneNumberAndUsernameAlreadyPresent(String contactPhoneNum, String userName) {
+    boolean isContactPhoneNumberAndUsernameAndGroupIdAlreadyPresent(String contactPhoneNum, String userName, String groupId) {
         boolean isContactPhoneNumberAlreadyPresent = false;
-        GroupContactsDoc groupContactsDoc = groupContactsDocRepository.findByContactPhoneNumAndUserName(contactPhoneNum, userName);
+        GroupContactsDoc groupContactsDoc = groupContactsDocRepository.findByContactPhoneNumAndUserNameAndGroupId(contactPhoneNum, userName, groupId);
         if (!(groupContactsDoc == null)) {
             isContactPhoneNumberAlreadyPresent = true;
         }
