@@ -213,7 +213,7 @@ public class GroupContactsLogic {
         OutgoingPayload outgoingPayload;
 
         List<GroupContactsDoc> groupContactsDocs = getGroupContactsListFromDbUsingGroupId(groupId);
-        if (!(groupContactsDocs.isEmpty())) {
+        if ((isGroupIdPresentInGroupsDocument(groupId))) {
             outgoingPayload = new SuccessfulOutgoingPayload(groupContactsDocs);
         } else {
             outgoingPayload = new ErrorOutgoingPayload("GroupId does not exist");
