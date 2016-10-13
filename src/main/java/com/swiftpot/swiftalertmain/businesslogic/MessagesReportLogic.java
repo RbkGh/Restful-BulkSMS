@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import com.swiftpot.swiftalertmain.db.model.MessagesDetailedReportDoc;
 import com.swiftpot.swiftalertmain.db.model.MessagesReportDoc;
 import com.swiftpot.swiftalertmain.models.ErrorOutgoingPayload;
+import com.swiftpot.swiftalertmain.models.MessagesDetailedReportResponse;
 import com.swiftpot.swiftalertmain.models.OutgoingPayload;
 import com.swiftpot.swiftalertmain.models.SuccessfulOutgoingPayload;
+import com.swiftpot.swiftalertmain.repositories.MessageContentDocRepository;
 import com.swiftpot.swiftalertmain.repositories.MessagesDetailedReportDocRepository;
 import com.swiftpot.swiftalertmain.repositories.MessagesReportDocRepository;
 import org.slf4j.Logger;
@@ -30,6 +32,8 @@ public class MessagesReportLogic {
     MessagesReportDocRepository messagesReportDocRepository;
     @Autowired
     MessagesDetailedReportDocRepository messagesDetailedReportDocRepository;
+    @Autowired
+    MessageContentDocRepository messageContentDocRepository;
 
     public OutgoingPayload getAllMessagesReportByUserName(String userName) {
         log.info("getMessagesReportRequest userName = " + userName);
@@ -49,7 +53,9 @@ public class MessagesReportLogic {
         OutgoingPayload outgoingPayload;
         try {
             List<MessagesDetailedReportDoc> messagesDetailedReportDocList = messagesDetailedReportDocRepository.findByMessageId(messageId);
-            outgoingPayload = new SuccessfulOutgoingPayload(messagesDetailedReportDocList);
+            String message = messageContentDocRepository.findByMessageId(messageId).getMessage();
+            MessagesDetailedReportResponse messagesDetailedReportResponse = new MessagesDetailedReportResponse(message,messagesDetailedReportDocList);
+            outgoingPayload = new SuccessfulOutgoingPayload(messagesDetailedReportResponse);
         } catch (Exception e) {
             outgoingPayload = new ErrorOutgoingPayload("Group Id does not exist");
         }

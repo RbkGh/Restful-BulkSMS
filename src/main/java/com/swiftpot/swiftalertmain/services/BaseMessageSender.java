@@ -1,18 +1,12 @@
 package com.swiftpot.swiftalertmain.services;
 
 import com.google.gson.Gson;
-import com.swiftpot.swiftalertmain.db.model.GroupContactsDoc;
-import com.swiftpot.swiftalertmain.db.model.MessagesDetailedReportDoc;
-import com.swiftpot.swiftalertmain.db.model.MessagesReportDoc;
-import com.swiftpot.swiftalertmain.db.model.UserDoc;
+import com.swiftpot.swiftalertmain.db.model.*;
 import com.swiftpot.swiftalertmain.helpers.CustomDateFormat;
 import com.swiftpot.swiftalertmain.helpers.DeliveryStatus;
 import com.swiftpot.swiftalertmain.ifaces.SMSSender;
 import com.swiftpot.swiftalertmain.models.SMSSenderRequest;
-import com.swiftpot.swiftalertmain.repositories.GroupsDocRepository;
-import com.swiftpot.swiftalertmain.repositories.MessagesDetailedReportDocRepository;
-import com.swiftpot.swiftalertmain.repositories.MessagesReportDocRepository;
-import com.swiftpot.swiftalertmain.repositories.UserDocRepository;
+import com.swiftpot.swiftalertmain.repositories.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +35,8 @@ public class BaseMessageSender {
     MessagesReportDocRepository messagesReportDocRepository;
     @Autowired
     MessagesDetailedReportDocRepository messagesDetailedReportDocRepository;
+    @Autowired
+    MessageContentDocRepository messageContentDocRepository;
     @Autowired
     UserDocRepository userDocRepository;
     @Autowired
@@ -103,6 +99,7 @@ public class BaseMessageSender {
                     senderIdGlobal,
                     groupId,
                     userNameGlobal);
+            MessageContentsDoc messageContentsDoc = new MessageContentsDoc(messageIdGlobal,messageToSendGlobal,dateNow);
 
             if(!smsSender.isMessageSendingSuccessful(smsSenderRequest)){
                 unsuccessfulMessagesCount.add(false);
@@ -111,6 +108,7 @@ public class BaseMessageSender {
                  */
                 messagesDetailedReportDoc.setDeliveryStatus(DeliveryStatus.NO.toString());
                 messagesDetailedReportDocRepository.save(messagesDetailedReportDoc);
+                messageContentDocRepository.save(messageContentsDoc);
             }else{
                 /**
                  * Set Delivery Status to YES,since message was sent successfully
@@ -118,6 +116,7 @@ public class BaseMessageSender {
                 successfulMessagesCount.add(true);
                 messagesDetailedReportDoc.setDeliveryStatus(DeliveryStatus.YES.toString());
                 messagesDetailedReportDocRepository.save(messagesDetailedReportDoc);
+                messageContentDocRepository.save(messageContentsDoc);
             }
 
         }
