@@ -1,0 +1,6 @@
+{
+  "name": "Restful-bulksms",
+  "tagline": "Fully Restful Bulksms Api with MongoDb",
+  "body": "_# I cashed out on this project,As it's not primary business,guess I just had to share ..=D =D_\r\n\r\n# # just run the following ,Homie :\r\n\r\nin Root folder of project,type:\r\n\r\n1.**gradle build**\r\n\r\n2.find application.properties file in src/main/java/resources/ folder\r\nedit this to suit the url of your mongo installation\r\n\r\n3.**gradle bootRun**\r\n\r\nu can then access the endpoints from **localhost:8080/**\r\nyou can insert a userName and password in your MongoDb with\r\n **db.getCollection('GeneralUserDoc').find({\"userName\":\"r2\",\"password\":\"222\"})**\r\n\r\nafterwards,for eg,to authenticate,just post **{\"userName\":\"r2\",\"password\":\"222\"}** to\r\n**localhost:8080/auth** with consumes header of **application/json**.\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
