@@ -1,4 +1,4 @@
-just run the following Charley :
+"just run the following Charley :
 
 in Root folder of project,type:
 
@@ -12,4 +12,4 @@ you can insert a userName and password in your MongoDb with
  db.getCollection('GeneralUserDoc').find({"userName":"r2","password":"222"})
 
 afterwards,for eg,to authenticate,just post {"userName":"r2","password":"222"} to
-localhost:8080/auth with consumes header of application/json.
+localhost:8080/auth with consumes header of application/json."
